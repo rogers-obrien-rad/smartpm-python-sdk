@@ -4,3 +4,12 @@
 
 # SmartPM SDK
 _Python wrapper for the SmartPM API_
+
+# Installation
+
+# Snippets
+
+
+# Resources
+* [SmartPM Platform Login](https://live.smartpmtech.com/auth/login)
+* [SmartPM Developers Documentation](https://developers.smartpmtech.com/)
