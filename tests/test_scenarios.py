@@ -118,3 +118,35 @@ def test_get_percent_complete_curve(scenarios, projects):
     logger.info("Percent Complete Curve: %s", pretty_curve)
     
     assert isinstance(percent_complete_curve, dict)
+
+def test_get_earned_schedule_curve(scenarios, projects):
+    """Test retrieving earned schedule curve for a specific scenario by its ID."""
+    # Get a list of projects to use a valid project ID
+    all_projects = projects.get_projects()
+    logger.info("Number of projects: %d", len(all_projects))
+    
+    assert isinstance(all_projects, list)
+    assert len(all_projects) > 0
+    
+    first_project = all_projects[0]
+    project_id = first_project['id']
+    
+    # Retrieve scenarios for the first project
+    project_scenarios = scenarios.get_scenarios(project_id)
+    logger.info("Project ID: %s", project_id)
+    
+    assert isinstance(project_scenarios, list)
+    assert len(project_scenarios) > 0
+    
+    first_scenario = project_scenarios[0]
+    scenario_id = first_scenario['id']
+    
+    # Retrieve earned schedule curve for the first scenario
+    earned_schedule_curve = scenarios.get_earned_schedule_curve(project_id, scenario_id)
+    logger.info("Scenario ID: %s", scenario_id)
+    
+    # Pretty-print the earned schedule curve
+    pretty_curve = json.dumps(earned_schedule_curve, indent=4)
+    logger.info("Earned Schedule Curve: %s", pretty_curve)
+    
+    assert isinstance(earned_schedule_curve, dict)
