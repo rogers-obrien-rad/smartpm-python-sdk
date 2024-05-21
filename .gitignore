@@ -215,3 +215,6 @@ replay_pid*
 
 # VS Code
 *.code-workspace
+
+# Directories
+*reference*

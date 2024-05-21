@@ -2,7 +2,7 @@ import requests
 from smartpm.exceptions import SmartPMError, AuthenticationError, NotFoundError, RateLimitExceededError, BadRequestError, NoCommentsFoundError
 
 class SmartPMClient:
-    BASE_URL = 'https://live.smartpmtech.com/public/v1'
+    BASE_URL = 'https://live.smartpmtech.com/public'
 
     def __init__(self, api_key, company_id):
         self.api_key = api_key
