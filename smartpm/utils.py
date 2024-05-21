@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
 import datetime
 
-def plot_percent_complete_curve(curve_data):
+def plot_percent_complete_curve(json_data):
     """
     Plot the progress curve from scenario data.
     Reproduces this figure from SmartPM: https://help.smartpmtech.com/the-progress-curve
 
     Parameters
     ----------
-    curve_data : dict
+    json_data : dict
         Dictionary containing percent complete types and scenario data with progress information.
     """
-    percent_complete_types = curve_data['percentCompleteTypes']
-    scenario_data = curve_data['data']
+    percent_complete_types = json_data['percentCompleteTypes']
+    scenario_data = json_data['data']
 
     # Extract dates and values for each type of progress
     dates = [datetime.datetime.strptime(point['DATE'], '%Y-%m-%d') for point in scenario_data]
