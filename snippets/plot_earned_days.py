@@ -25,25 +25,16 @@ def main():
     # ---------------------------------------------------------
     # Find project by name
     name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
-    projects = projects_api.get_projects()
-    project_id = projects[0]["id"] # default to first project
-    for project in projects:
-        if project["name"] == name_to_find:
-            print(f"Found Project: {project['id']} - {project['name']}")
-            project_id = project["id"]
-            break
+    project = projects_api.find_project_by_name(name=name_to_find)
+    project_id = project["id"]
 
     # Find scenario by name
     scenario_to_find = "Full Schedule" # replace with your scenario name
-    scenarios = scenarios_api.get_scenarios(project_id=project_id)
-    print(json.dumps(scenarios, indent=4))
-    scenario_id = scenarios[0]["id"] # default to first scenario
-    for scenario in scenarios:
-        if scenario["name"] == scenario_to_find:
-            print(f"Found Scenario:")
-            print(json.dumps(scenario, indent=4))
-            scenario_id = scenario["id"]
-            # don't break since there are might be multiple matching scenarios and we want to get the latest
+    matching_scenarios = scenarios_api.find_scenario_by_name(
+        project_id=project_id,
+        scenario_name=scenario_to_find
+    )
+    scenario_id = matching_scenarios[-1].get("id")
 
     # Check data
     complete_curve = scenarios_api.get_earned_schedule_curve(
