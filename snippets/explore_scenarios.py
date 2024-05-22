@@ -39,12 +39,12 @@ def main():
     # View Scenario Details
     # ---------------------
     # Get latest scenario for "Full Schedule"
-    scenario_id = scenarios[0]["id"] # default to the first scenario in the list
-    for scenario in scenarios:
-        if scenario["name"] == "Full Schedule":
-            scenario_id = scenario["id"]
-            print("Scenario Summay: 'Full Schedule'")
-            print(json.dumps(scenario, indent=4))
+    scenario_to_find = "Full Schedule" # replace with your scenario name
+    matching_scenarios = scenarios_api.find_scenario_by_name(
+        project_id=project_id,
+        scenario_name=scenario_to_find
+    )
+    scenario_id = matching_scenarios[-1].get("id")
 
     print(f"Getting scenario details for Scenario {scenario_id}")
     scenario_details = scenarios_api.get_scenario_details(

@@ -33,6 +33,35 @@ class Scenarios:
 
         return self.client._get(endpoint=endpoint, params=params)
 
+    @utility
+    def find_scenario_by_name(self, project_id, scenario_name):
+        """
+        Find scenarios by their name for a specific project.
+
+        Parameters
+        ----------
+        project_id : int
+            ID of the project to retrieve scenarios for
+        scenario_name : str
+            The name of the scenario to find
+
+        Returns
+        -------
+        matching_scenarios : list of dict
+            List of scenarios matching the specified name
+        """
+        logger.debug(f"Searching for scenarios with name: {scenario_name} in project_id: {project_id}")
+        scenarios = self.get_scenarios(project_id)
+        
+        matching_scenarios = [scenario for scenario in scenarios if scenario.get('name') == scenario_name]
+        
+        if matching_scenarios:
+            logger.info(f"Found {len(matching_scenarios)} matching scenarios.")
+        else:
+            logger.info(f"No scenarios found with name '{scenario_name}'.")
+
+        return matching_scenarios
+    
     @api_wrapper
     def get_scenario_details(self, project_id, scenario_id, data_date=None):
         """

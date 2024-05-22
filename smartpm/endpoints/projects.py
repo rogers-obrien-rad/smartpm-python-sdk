@@ -1,5 +1,5 @@
 from smartpm.client import SmartPMClient
-from smartpm.decorators import api_wrapper
+from smartpm.decorators import api_wrapper, utility
 from smartpm.logging_config import logger 
 class Projects:
     def __init__(self, client: SmartPMClient):
@@ -69,3 +69,29 @@ class Projects:
         endpoint = f'v1/projects/{project_id}/comments'
         response = self.client._get(endpoint=endpoint)
         return response
+
+    @utility
+    def find_project_by_name(self, name):
+        """
+        Find a project by its name.
+
+        Parameters
+        ----------
+        name : str
+            The name of the project to find
+
+        Returns
+        -------
+        project : dict
+            The project data if found, otherwise None
+        """
+        logger.debug(f"Searching for project with name: {name}")
+        projects = self.get_projects()
+        
+        for project in projects:
+            if project.get('name') == name:
+                logger.info(f"Found project: {project['id']} - {project['name']}")
+                return project
+        
+        logger.info(f"Project with name '{name}' not found.")
+        return None
