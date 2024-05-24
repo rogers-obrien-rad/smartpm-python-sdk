@@ -140,3 +140,63 @@ def plot_earned_schedule_curve(json_data):
 
     plt.tight_layout()
     plt.show()
+
+import matplotlib.pyplot as plt
+import datetime
+
+def plot_schedule_delay(json_data):
+    """
+    Plot the schedule delay curve from the provided JSON data.
+
+    Parameters
+    ----------
+    json_data : dict
+        Dictionary containing the schedule variance data.
+    """
+    data = json_data
+
+    # Extract dates and values for each type of variance
+    dates = [datetime.datetime.strptime(point['dataDate'], '%Y-%m-%dT%H:%M:%S') for point in data]
+    end_date_variance = [point['endDateVariance']['cumulative'] for point in data]
+    critical_path_delay = [point['criticalPathDelay']['cumulative'] for point in data]
+    acceleration = [point['delayRecovery']['cumulative']*-1 for point in data] # values are inverse in response
+
+    plt.figure(figsize=(14, 6))
+    ms = 4  # marker size
+    lw = 2  # linewidth
+
+    plt.plot(dates, end_date_variance, label='End Date Variance', marker='o', markersize=ms, linestyle='-', linewidth=lw, color="goldenrod")
+    plt.plot(dates, critical_path_delay, label='Critical Path Delay', marker='d', markersize=ms, linestyle='-', linewidth=lw, color="firebrick")
+    plt.plot(dates, acceleration, label='Acceleration', marker='s', markersize=ms, linestyle='-', linewidth=lw, color="seagreen")
+
+    # Shade the area between each curve and the x-axis
+    plt.fill_between(dates, end_date_variance, color="goldenrod", alpha=0.7)
+    plt.fill_between(dates, critical_path_delay, color="firebrick", alpha=0.7)
+    plt.fill_between(dates, acceleration, color="seagreen", alpha=0.7)
+
+    plt.title('Schedule Delay Over Time')
+
+    # Customize x-axis to show the first of every month with the format "mm/dd/yy"
+    plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%m/%d/%y'))
+    plt.gca().xaxis.set_major_locator(plt.matplotlib.dates.MonthLocator(bymonthday=1, interval=2))
+
+    # Rotate the x-axis labels by -30 degrees and align them to the left
+    plt.xticks(rotation=-30, ha='left')
+
+    # Remove top, right, and left spines
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    # Draw a vertical line for the current date if it is before the last date in data
+    current_date = datetime.datetime.now()
+    if current_date < max(dates):
+        plt.axvline(x=current_date, color='black', linestyle='-', linewidth=lw + 1, label='Current Date')
+
+    # Place the legend below the x-axis with no box around it on one line
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=7, frameon=False)
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
