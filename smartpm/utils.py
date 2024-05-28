@@ -141,9 +141,6 @@ def plot_earned_schedule_curve(json_data):
     plt.tight_layout()
     plt.show()
 
-import matplotlib.pyplot as plt
-import datetime
-
 def plot_schedule_delay(json_data):
     """
     Plot the schedule delay curve from the provided JSON data.
@@ -196,6 +193,73 @@ def plot_schedule_delay(json_data):
 
     # Place the legend below the x-axis with no box around it on one line
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=7, frameon=False)
+    plt.grid(True)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_schedule_changes(json_data):
+    """
+    Plot the schedule changes over time from the provided JSON data.
+
+    Parameters
+    ----------
+    json_data : list of dict
+        List of dictionaries containing the schedule change data.
+    """
+    # Extract dates and metrics
+    dates = [datetime.datetime.strptime(entry['dataDate'], '%Y-%m-%dT%H:%M:%S') for entry in json_data]
+    
+    metrics = json_data[0]['metrics'].keys()
+    
+    # Initialize a dictionary to hold lists of metric values
+    metric_values = {metric: [] for metric in metrics}
+    
+    # Populate the metric values dictionary
+    for entry in json_data:
+        for metric in metrics:
+            metric_values[metric].append(entry['metrics'][metric])
+
+    # Define colors and linestyles for each metric
+    color_linestyle_dict = {
+        "CriticalChanges": {"color": 'red', "marker": 'o'},
+        "NearCriticalChanges": {"color": 'goldenrod', "marker": 'd'},
+        "ActivityChanges": {"color": 'seagreen', "marker": 's'},
+        "LogicChanges": {"color": 'blue', "marker": '^'},
+        "CalendarChanges": {"color": 'dodgerblue', "marker": 'v'},
+        "DurationChanges": {"color": 'steelblue', "marker": 'o'},
+        "DelayedActivityChanges": {"color": 'firebrick', "marker": 'd'},
+    }
+
+    plt.figure(figsize=(14, 10))
+    ms = 4  # marker size
+    lw = 2  # linewidth
+    
+    for metric, style in color_linestyle_dict.items():
+        plt.plot(dates, metric_values[metric], label=metric, marker=style["marker"], markersize=ms, linewidth=lw, color=style["color"])
+    
+    plt.title('Schedule Changes Over Time')
+
+    # Customize x-axis to show the first of every month with the format "mm/dd/yy"
+    plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%m/%d/%y'))
+    plt.gca().xaxis.set_major_locator(plt.matplotlib.dates.MonthLocator(bymonthday=1, interval=2))
+
+    # Rotate the x-axis labels by -30 degrees and align them to the left
+    plt.xticks(rotation=-30, ha='left')
+
+    # Remove top, right, and left spines
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    # Draw a vertical line for the current date if it is before the last date in data
+    current_date = datetime.datetime.now()
+    if current_date < max(dates):
+        plt.axvline(x=current_date, color='black', linestyle='-', linewidth=lw + 1, label='Current Date')
+
+    # Place the legend below the x-axis with no box around it on one line
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=4, frameon=False)
     plt.grid(True)
 
     plt.tight_layout()
