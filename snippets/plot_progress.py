@@ -52,7 +52,7 @@ def main():
     )
     print(json.dumps(complete_curve["data"][0], indent=4))
 
-    scenarios_api.plot_scenario_progress(
+    scenarios_api.plot_percent_complete_curve(
         project_id=project_id,
         scenario_id=scenario_id
     )

@@ -1,6 +1,10 @@
+import pandas as pd
+
 from smartpm.client import SmartPMClient
 from smartpm.decorators import api_wrapper, utility
 from smartpm.logging_config import logger 
+
+
 class Projects:
     def __init__(self, client: SmartPMClient):
         self.client = client
@@ -95,3 +99,30 @@ class Projects:
         
         logger.info(f"Project with name '{name}' not found.")
         return None
+    
+    @utility
+    def get_projects_dataframe(self):
+        """
+        Get all projects and return as a DataFrame with selected columns.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing projects data with selected columns.
+        """
+        projects = self.get_projects()
+
+        # Extract relevant fields and metadata
+        project_data = []
+        for project in projects:
+            project_data.append({
+                "id": project["id"],
+                "name": project["name"],
+                "startDate": project["startDate"],
+                "city": project["city"],
+                "projectNumber": project["metadata"].get("PROJECT_NUMBER"),
+                "region": project["metadata"].get("REGION")
+            })
+        
+        df = pd.DataFrame(project_data, columns=["id", "name", "startDate", "city", "projectNumber", "region"])
+        return df
