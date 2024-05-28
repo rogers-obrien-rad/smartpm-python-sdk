@@ -26,7 +26,7 @@ def main():
     # Get All Activities
     # -----------------
     # Find project by name
-    name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
+    name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name 
     project = projects_api.find_project_by_name(name=name_to_find)
     project_id = project["id"]
 
@@ -60,7 +60,7 @@ def main():
     
     # Get Activity by Activity ID
     # ---------------------------
-    activity_id = "SHL.3770"
+    activity_id = "N.SKIN2010"
     activity_by_id = activity_api.get_activity_by_id(
         project_id=project_id,
         scenario_id=scenario_id,
@@ -72,17 +72,31 @@ def main():
 
     # Get Baseline Data
     # -----------------
-    mo=9
-    y=2022
+    baseline_mo=10
+    baseline_y=2023
     baseline_activity_data_by_month = activity_api.get_baseline_activities_by_month(
         project_id=project_id,
         scenario_id=scenario_id,
         start=True,
-        month=mo,
-        year=y
+        month=baseline_mo,
+        year=baseline_y
     )
-    baseline_activity_data_by_month.to_csv(f"reference/baseline_activities_{project_id}_{scenario_id}_{y}-{mo}.csv")
+    baseline_activity_data_by_month.to_csv(f"reference/baseline_activities_{project_id}_{scenario_id}_{baseline_y}-{baseline_mo}.csv")
     # -----------------
+
+    # Get Current Data
+    # ----------------
+    current_mo=5
+    baseline_y=2024
+    current_activity_data_by_month = activity_api.get_current_activities_by_month(
+        project_id=project_id,
+        scenario_id=scenario_id,
+        start=True,
+        month=current_mo,
+        year=baseline_y
+    )
+    current_activity_data_by_month.to_csv(f"reference/current_activities_{project_id}_{scenario_id}_{baseline_y}-{current_mo}.csv")
+    # ----------------
 
     # Plot Activity Distribution
     # --------------------------
