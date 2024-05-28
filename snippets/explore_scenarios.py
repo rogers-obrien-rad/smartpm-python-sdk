@@ -23,17 +23,16 @@ def main():
 
     # Get All Scenarios
     # -----------------
-    project_idx = 0 # change to explore explore different projects
-    # Start by getting projects
-    print("Get All Projects")
-    projects = projects_api.get_projects()
+    # Find project by name
+    name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
+    project = projects_api.find_project_by_name(name=name_to_find)
+    project_id = project["id"]
 
     # Get scenarios by supplying the project ID from any project, in this case the first project in the list
-    project_id = projects[project_idx]['id']
     print(f"Get All Scenarios for project: {project_id}")
     scenarios = scenarios_api.get_scenarios(project_id=project_id)
-    print("Last Scenario: Summary")
-    print(json.dumps(scenarios[-1], indent=4)) # view the first scenario
+    print("Scenarios:")
+    print(json.dumps(scenarios, indent=4))
     # -----------------
 
     # View Scenario Details

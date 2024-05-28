@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import datetime
+import pandas as pd
+
+from collections import defaultdict
 
 def plot_percent_complete_curve(json_data):
     """
@@ -264,3 +267,93 @@ def plot_schedule_changes(json_data):
 
     plt.tight_layout()
     plt.show()
+
+def plot_activity_distribution_by_month(json_data, scenario_details):
+    """
+    Plot the activity start and finish dates by month from the provided JSON data.
+
+    Parameters
+    ----------
+    json_data : list of dict
+        List of dictionaries containing the activity data.
+    """
+    # Data date
+    data_date = datetime.datetime.strptime(scenario_details["dataDate"], "%Y-%m-%d")
+
+    # Initialize a dictionary to hold counts for each month and category
+    counts = defaultdict(lambda: defaultdict(int))
+
+    # Extract and count the relevant dates
+    for entry in json_data:
+        dates = {
+            'Baseline Starts': entry['baseline'].get('startDate'),
+            'Baseline Finishes': entry['baseline'].get('finishDate')
+        }
+        # Start Dates
+        if pd.to_datetime(entry['actualStartDate']):
+            dates['Current Starts (Actual)'] = entry['actualStartDate']
+        
+        if pd.to_datetime(entry['startDate']) is not None and pd.to_datetime(entry['startDate']) >= data_date:
+            dates['Current Starts (Planned)'] = entry['startDate']
+
+        # Finish Dates
+        if pd.to_datetime(entry['actualFinishDate']):
+            dates['Current Finishes (Actual)'] = entry['actualFinishDate']
+        elif pd.to_datetime(entry['finishDate']) is not None:
+            dates['Current Finishes (Planned)'] = entry['finishDate']
+        
+        for date_type, date_str in dates.items():
+            if date_str:
+                date_obj = pd.to_datetime(date_str)
+                month_year = (date_obj).strftime('%Y-%m')
+                counts[month_year][date_type] += 1
+
+    # Convert the counts dictionary to a DataFrame for easier plotting
+    df_counts = pd.DataFrame(counts).fillna(0).T
+    df_counts.index = pd.to_datetime(df_counts.index)
+
+    # Define colors for each date type
+    colors = {
+        'Current Starts (Actual)': 'lightsteelblue',
+        'Current Finishes (Actual)': 'cornflowerblue',
+        'Current Starts (Planned)': 'lightgreen',
+        'Current Finishes (Planned)': 'darkgreen',
+        'Baseline Starts': 'lightgrey',
+        'Baseline Finishes': 'darkgrey'
+    }
+
+    # Plotting
+    _, ax = plt.subplots(figsize=(14, 8))
+    width = 3  # width of the bars
+
+    # Plot bars for each date type
+    for i, date_type in enumerate(df_counts.columns):
+        offset = (i - (len(df_counts.columns) - 1) / 2) * width  # center the bars around the first of the month
+        ax.bar(df_counts.index + pd.DateOffset(months=-1, days=offset), df_counts[date_type], width=width, label=date_type, color=colors[date_type])
+
+    # Customize x-axis to show the first of every month with the format "mm/yyyy"
+    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b-%y'))
+    ax.xaxis.set_major_locator(plt.matplotlib.dates.MonthLocator())
+
+    # Rotate the x-axis labels by -30 degrees and align them to the right
+    plt.xticks(rotation=-30, ha='right')
+    
+    # Remove top, right, and left spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    # Draw a vertical line for the current date and add the current date text
+    ax.axvline(x=data_date + pd.DateOffset(months=-1), color='black', linestyle='--', linewidth=1)
+    max_height = df_counts.max().max()
+    ax.text(data_date + pd.DateOffset(months=-1, days=1), max_height, f"Data Date: {data_date.strftime('%d %b-%y')}", rotation=-90, verticalalignment='top', horizontalalignment='left')
+
+    # Place the legend below the x-axis with no box around it on one line
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.10), ncol=6, frameon=False)
+    plt.grid(True, axis='y')
+
+    plt.title('Monthly Activity Start & Finish Distribution')
+    plt.tight_layout()
+    plt.show()
+
+    return df_counts.sort_index()
