@@ -45,8 +45,8 @@ def main():
     )
     # print(json.dumps(activities, indent=4))
     print(f"Number of activities: {len(activities)}")
-    print("Example activity:")
-    print(json.dumps(activities[0], indent=4))
+    print("Example activities:")
+    print(json.dumps(activities[-2:], indent=4))
     # -----------------
 
     # Count Complete/Incomplete
@@ -57,6 +57,40 @@ def main():
     )
     print(activity_counts)
     # -------------------------
+    
+    # Get Activity by Activity ID
+    # ---------------------------
+    activity_id = "SHL.3770"
+    activity_by_id = activity_api.get_activity_by_id(
+        project_id=project_id,
+        scenario_id=scenario_id,
+        activity_id=activity_id
+    )
+    print(f"Details for Activity {activity_id}")
+    print(json.dumps(activity_by_id,indent=4))
+    # ---------------------------
+
+    # Get Baseline Data
+    # -----------------
+    mo=9
+    y=2022
+    baseline_activity_data_by_month = activity_api.get_baseline_activities_by_month(
+        project_id=project_id,
+        scenario_id=scenario_id,
+        start=True,
+        month=mo,
+        year=y
+    )
+    baseline_activity_data_by_month.to_csv(f"reference/baseline_activities_{project_id}_{scenario_id}_{y}-{mo}.csv")
+    # -----------------
+
+    # Plot Activity Distribution
+    # --------------------------
+    activity_dist = activity_api.plot_activity_distribution(
+        project_id=project_id,
+        scenario_id=scenario_id
+    )
+    activity_dist.to_csv(f"reference/activity_distribution_{project_id}_{scenario_id}.csv")
     
 if __name__ == "__main__":
     main()
