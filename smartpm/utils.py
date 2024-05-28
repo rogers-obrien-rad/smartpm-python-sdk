@@ -268,7 +268,7 @@ def plot_schedule_changes(json_data):
     plt.tight_layout()
     plt.show()
 
-def plot_activity_distribution_by_month(json_data):
+def plot_activity_distribution_by_month(json_data, scenario_details):
     """
     Plot the activity start and finish dates by month from the provided JSON data.
 
@@ -277,30 +277,35 @@ def plot_activity_distribution_by_month(json_data):
     json_data : list of dict
         List of dictionaries containing the activity data.
     """
+    # Data date
+    data_date = datetime.datetime.strptime(scenario_details["dataDate"], "%Y-%m-%d")
+
     # Initialize a dictionary to hold counts for each month and category
     counts = defaultdict(lambda: defaultdict(int))
 
     # Extract and count the relevant dates
     for entry in json_data:
-        if entry['percentComplete'] < 100.0 or entry['percentComplete'] is None:
-            dates = {
-                'Current Starts (Planned)': entry.get('startDate'),
-                'Current Finishes (Planned)': entry.get('finishDate'),
-                'Baseline Starts': entry['baseline'].get('startDate'),
-                'Baseline Finishes': entry['baseline'].get('finishDate')
-            }
-        else:
-            dates = {
-                'Current Starts (Actual)': entry.get('startDate'),
-                'Current Finishes (Actual)': entry.get('finishDate'),
-                'Baseline Starts': entry['baseline'].get('startDate'),
-                'Baseline Finishes': entry['baseline'].get('finishDate')
-            }
+        dates = {
+            'Baseline Starts': entry['baseline'].get('startDate'),
+            'Baseline Finishes': entry['baseline'].get('finishDate')
+        }
+        # Start Dates
+        if pd.to_datetime(entry['actualStartDate']):
+            dates['Current Starts (Actual)'] = entry['actualStartDate']
+        
+        if pd.to_datetime(entry['startDate']) is not None and pd.to_datetime(entry['startDate']) >= data_date:
+            dates['Current Starts (Planned)'] = entry['startDate']
 
+        # Finish Dates
+        if pd.to_datetime(entry['actualFinishDate']):
+            dates['Current Finishes (Actual)'] = entry['actualFinishDate']
+        elif pd.to_datetime(entry['finishDate']) is not None:
+            dates['Current Finishes (Planned)'] = entry['finishDate']
+        
         for date_type, date_str in dates.items():
             if date_str:
                 date_obj = pd.to_datetime(date_str)
-                month_year = (date_obj - pd.DateOffset(months=1)).strftime('%Y-%m')
+                month_year = (date_obj).strftime('%Y-%m')
                 counts[month_year][date_type] += 1
 
     # Convert the counts dictionary to a DataFrame for easier plotting
@@ -323,8 +328,8 @@ def plot_activity_distribution_by_month(json_data):
 
     # Plot bars for each date type
     for i, date_type in enumerate(df_counts.columns):
-        offset = (i - len(df_counts.columns) / 2) * (width)  # center the bars around the first of the month
-        ax.bar(df_counts.index + pd.DateOffset(days=offset), df_counts[date_type], width=width, label=date_type, color=colors[date_type])
+        offset = (i - (len(df_counts.columns) - 1) / 2) * width  # center the bars around the first of the month
+        ax.bar(df_counts.index + pd.DateOffset(months=-1, days=offset), df_counts[date_type], width=width, label=date_type, color=colors[date_type])
 
     # Customize x-axis to show the first of every month with the format "mm/yyyy"
     ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b-%y'))
@@ -339,17 +344,16 @@ def plot_activity_distribution_by_month(json_data):
     ax.spines['left'].set_visible(False)
 
     # Draw a vertical line for the current date and add the current date text
-    current_date = pd.to_datetime('today').normalize()
-    ax.axvline(x=current_date-pd.DateOffset(months=1), color='black', linestyle='--', linewidth=1)
+    ax.axvline(x=data_date + pd.DateOffset(months=-1), color='black', linestyle='--', linewidth=1)
     max_height = df_counts.max().max()
-    ax.text(current_date-pd.DateOffset(months=1)+datetime.timedelta(days=1), max_height, current_date.strftime('%d %b-%y'), rotation=-90, verticalalignment='top', horizontalalignment='left')
+    ax.text(data_date + pd.DateOffset(months=-1, days=1), max_height, f"Data Date: {data_date.strftime('%d %b-%y')}", rotation=-90, verticalalignment='top', horizontalalignment='left')
 
     # Place the legend below the x-axis with no box around it on one line
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=6, frameon=False)
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.10), ncol=6, frameon=False)
     plt.grid(True, axis='y')
 
     plt.title('Monthly Activity Start & Finish Distribution')
     plt.tight_layout()
     plt.show()
 
-    return df_counts
+    return df_counts.sort_index()
