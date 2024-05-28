@@ -1,5 +1,7 @@
+import pandas as pd
+
 from smartpm.client import SmartPMClient
-from smartpm.utils import plot_percent_complete_curve, plot_earned_schedule_curve
+from smartpm.utils import plot_activity_distribution_by_month
 from smartpm.decorators import api_wrapper, utility
 from smartpm.logging_config import logger
 
@@ -74,3 +76,94 @@ class Activity:
             'complete': complete_count,
             'incomplete': incomplete_count
         }
+    
+    @utility
+    def plot_activity_distribution(self, project_id, scenario_id):
+        """
+        Retrieve activities and plots distribution by month
+
+        Parameters
+        ----------
+        project_id : str
+            ID of the project containing the scenario
+        scenario_id : str
+            ID of the scenario to retrieve the percent complete curve for
+        """
+        logger.debug(f"Plotting activity distribution for project_id: {project_id}, scenario_id: {scenario_id}")
+        activity_data = self.get_activities(project_id, scenario_id)
+        activity_dist = plot_activity_distribution_by_month(activity_data)
+        return activity_dist
+    
+    @utility
+    def get_activity_by_id(self, project_id, scenario_id, activity_id):
+        """
+        Get the data for a specific activity by its ID.
+
+        Parameters
+        ----------
+        project_id : str
+            ID of the project containing the scenario
+        scenario_id : str
+            ID of the scenario to retrieve the activity from
+        activity_id : str
+            ID of the activity to retrieve
+
+        Returns
+        -------
+        dict
+            Dictionary containing the activity data.
+        """
+        activity_data = self.get_activities(project_id, scenario_id)
+        for entry in activity_data:
+            if entry['activityId'] == activity_id:
+                return entry
+        return None  # Return None if the activity is not found
+    
+    @utility
+    def get_baseline_activities_by_month(self, project_id, scenario_id, start, month, year):
+        """
+        Filter activities by baseline start or finish date for a given month and year.
+
+        Parameters
+        ----------
+        project_id : str
+            ID of the project containing the scenario
+        scenario_id : str
+            ID of the scenario to retrieve the percent complete curve for
+        start : bool
+            If True, filter by baseline start date, otherwise filter by baseline finish date.
+        month : int
+            The month to filter by.
+        year : int
+            The year to filter by.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing the filtered activities with the specified columns.
+        """
+        filtered_data = []
+
+        activity_data = self.get_activities(project_id, scenario_id)
+        for entry in activity_data:
+            baseline_date_str = entry['baseline']['startDate'] if start else entry['baseline']['finishDate']
+            baseline_date = pd.to_datetime(baseline_date_str)
+            
+            if baseline_date.month == month and baseline_date.year == year:
+                filtered_data.append({
+                    "activityId": entry['activityId'],
+                    "name": entry['name'],
+                    "baselineStartDate": entry['baseline']['startDate'],
+                    "baselineFinishDate": entry['baseline']['finishDate'],
+                    "plannedDuration": entry['plannedDuration'],
+                    "startDate": entry.get('startDate'),
+                    "finishDate": entry.get('finishDate'),
+                    "actualDuration": entry.get('actualDuration')
+                })
+
+        df = pd.DataFrame(filtered_data, columns=[
+            "activityId", "name", "baselineStartDate", "baselineFinishDate",
+            "plannedDuration", "startDate", "finishDate", "actualDuration"
+        ])
+
+        return df
