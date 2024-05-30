@@ -37,13 +37,18 @@ def main():
 
     # View Scenario Details
     # ---------------------
-    # Get latest scenario for "Full Schedule"
-    scenario_to_find = "Full Schedule" # replace with your scenario name
-    matching_scenarios = scenarios_api.find_scenario_by_name(
-        project_id=project_id,
-        scenario_name=scenario_to_find
-    )
-    scenario_id = matching_scenarios[-1].get("id")
+    use_default = True
+    if use_default:
+        # Get default project scenario
+        scenario_id = project['defaultScenarioId']
+    else:
+        # Get latest Full Schedule scenario
+        scenario_to_find = "Full Schedule" # replace with your scenario name
+        matching_scenarios = scenarios_api.find_scenario_by_name(
+            project_id=project_id,
+            scenario_name=scenario_to_find
+        )
+        scenario_id = matching_scenarios[-1].get("id")
 
     print(f"Getting scenario details for Scenario {scenario_id}")
     scenario_details = scenarios_api.get_scenario_details(
@@ -66,6 +71,8 @@ def main():
     print(f"Number of datapoints: {len(data['data'])}")
     print("Example data entry:")
     print(json.dumps(data["data"][0], indent=4))
+    with open("reference/get_percent_complete_curve.json", 'w') as file:
+        json.dump(data, file, indent=4)
     # Plot the curves
     scenarios_api.plot_percent_complete_curve(
         project_id=project_id,
