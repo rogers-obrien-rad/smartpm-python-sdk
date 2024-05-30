@@ -133,7 +133,7 @@ class Scenarios:
         logger.debug(f"Plotting scenario progress for project_id: {project_id}, scenario_id: {scenario_id}, delta: {delta}")
         curve_data = self.get_percent_complete_curve(project_id, scenario_id, delta)
         plot_percent_complete_curve(curve_data)
-
+    
     @api_wrapper
     def get_earned_schedule_curve(self, project_id, scenario_id):
         """

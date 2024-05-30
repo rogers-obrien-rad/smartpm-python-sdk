@@ -167,10 +167,7 @@ class Activity:
                     "actualDuration": entry.get('actualDuration')
                 })
 
-        df = pd.DataFrame(filtered_data, columns=[
-            "activityId", "name", "baselineStartDate", "baselineFinishDate",
-            "plannedDuration", "startDate", "finishDate", "actualDuration"
-        ])
+        df = pd.DataFrame(filtered_data)
 
         return df
     
@@ -230,3 +227,51 @@ class Activity:
         df = pd.DataFrame(filtered_data)
 
         return df
+    
+    @utility
+    def get_earliest_date(self, project_id, scenario_id, use_actual=True):
+        """
+        Get the earliest date from list of activities
+
+        Parameters
+        ----------
+        project_id : str
+            ID of the project containing the scenario
+        scenario_id : str
+            ID of the scenario to retrieve the percent complete curve for
+        use_actual : bool, default True
+            If True, use 'actualStartDate', otherwise use 'startDate'.
+
+        Returns
+        -------
+        earliest_date : str
+            The earliest date as a string.
+        """
+        activities = self.get_activities(project_id, scenario_id)
+
+        date_key = 'actualStartDate' if use_actual else 'startDate'
+        dates = [entry[date_key] for entry in activities if entry[date_key] is not None]
+        earliest_date = min(dates, key=lambda date: pd.to_datetime(date))
+
+        return earliest_date
+    
+    def get_earliest_baseline_start_date(self, project_id, scenario_id):
+        """
+        Get the earliest baseline start date from the provided JSON data.
+
+        Parameters
+        ----------
+        json_data : list of dict
+            List of dictionaries containing the data.
+
+        Returns
+        -------
+        str
+            The earliest baseline start date as a string.
+        """
+        activities = self.get_activities(project_id, scenario_id)
+
+        dates = [entry['baseline']['startDate'] for entry in activities if entry['baseline']['startDate'] is not None]
+        earliest_date = min(dates, key=lambda date: pd.to_datetime(date))
+        
+        return earliest_date

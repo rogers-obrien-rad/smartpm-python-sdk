@@ -45,6 +45,8 @@ def main():
     )
     print("Example changes summary entry:")
     print(json.dumps(changes_summary[0], indent=4))
+    with open("reference/get_changes_summary.json", 'w') as file:
+        json.dump(changes_summary, file, indent=4)
     # -------------------
 
     # Plot Changes Summary
@@ -53,6 +55,16 @@ def main():
         project_id=project_id,
         scenario_id=scenario_id
     )
+
+    # Get Changes Details for All Log Types
+    # -------------------------------------
+    changes_details_all = changes_api.get_all_changes_details(
+        project_id=project_id,
+        scenario_id=scenario_id
+    )
+    with open("reference/get_changes_details_all.json", 'w') as file:
+        json.dump(changes_details_all, file, indent=4)
+    # -------------------------------------
     
 if __name__ == "__main__":
     main()

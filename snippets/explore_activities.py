@@ -105,6 +105,27 @@ def main():
         scenario_id=scenario_id
     )
     activity_dist.to_csv(f"reference/activity_distribution_{project_id}_{scenario_id}.csv")
+    # --------------------------
+
+    # Get Start Dates
+    # ---------------
+    easliest_normal = activity_api.get_earliest_date(
+        project_id=project_id,
+        scenario_id=scenario_id,
+        use_actual=False
+    )
+    earliest_actual = activity_api.get_earliest_date(
+        project_id=project_id,
+        scenario_id=scenario_id,
+        use_actual=True
+    )
+    earliest_baseline = activity_api.get_earliest_baseline_start_date(
+        project_id=project_id,
+        scenario_id=scenario_id
+    )
+    print("Earliest Normal Start Date:", easliest_normal)
+    print("Earliest Actual Start Date:", earliest_actual)
+    print("Earliest Baseline Start Date:", earliest_baseline)
     
 if __name__ == "__main__":
     main()

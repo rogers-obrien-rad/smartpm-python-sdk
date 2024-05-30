@@ -46,3 +46,26 @@ class Changes:
         logger.debug(f"Plotting changes summary for project_id: {project_id}, scenario_id: {scenario_id}")
         curve_data = self.get_changes_summary(project_id, scenario_id)
         plot_schedule_changes(curve_data)
+
+    @api_wrapper
+    def get_all_changes_details(self, project_id, scenario_id):
+        """
+        Retrieve detailed information about the specific change types that have happened to a scenario: https://developers.smartpmtech.com/#operation/get-all-change-log-details
+
+        Parameters
+        ----------
+        project_id : str
+            The Project ID containing the scenario for which you would like to pull the changes summary from
+        scenario_id : str
+            The Scenario ID for which you would like to pull the changes summary from
+        Returns
+        -------
+        <response.json> : dict
+            Changes summary data as a JSON object
+        """
+        logger.debug(f"Fetching changes details for project_id: {project_id}, scenario_id: {scenario_id}")
+
+        endpoint = f'v1/projects/{project_id}/scenarios/{scenario_id}/change-log'
+        response = self.client._get(endpoint=endpoint)
+
+        return response
