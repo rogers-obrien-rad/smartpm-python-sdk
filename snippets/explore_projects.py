@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 # Add the package root directory to the sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
@@ -66,6 +67,11 @@ def main():
 
     # Show project
     output_projects(project_list=[project_details]) # convert single project to list to use output function
+
+    # Get Project by Name
+    name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
+    project = projects_api.find_project_by_name(name=name_to_find)
+    print(json.dumps(project, indent=4))
     # --------------------
 
     # Get Project Comments
