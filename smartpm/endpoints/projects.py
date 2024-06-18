@@ -73,7 +73,7 @@ class Projects:
         endpoint = f'v1/projects/{project_id}/comments'
         response = self.client._get(endpoint=endpoint)
         return response
-
+    
     @utility
     def find_project_by_name(self, name):
         """
