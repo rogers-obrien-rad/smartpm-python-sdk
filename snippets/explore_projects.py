@@ -62,11 +62,9 @@ def main():
     # Get Specific Project
     # --------------------
     print("\nGet Specific Project")
-    project_id = projects[-1]["id"] # pull the last ID from the previously queried projects list
+    project_id = 47939
     project_details = projects_api.get_project(project_id=project_id)
-
-    # Show project
-    output_projects(project_list=[project_details]) # convert single project to list to use output function
+    print(json.dumps(project_details, indent=4))
 
     # Get Project by Name
     name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
@@ -77,7 +75,7 @@ def main():
     # Get Project Comments
     # --------------------
     print("\nGet Project Comments")
-    for project in projects:
+    for project in projects[:4]:
         try:
             project_comments = projects_api.get_project_comments(project_id=project["id"])
             print(project_comments)

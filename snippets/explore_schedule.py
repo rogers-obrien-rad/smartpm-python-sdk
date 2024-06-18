@@ -23,8 +23,8 @@ def main():
     scenarios_api = Scenarios(client)
     schedule_api = Schedule(client)
 
-    # Get Schedule Quality
-    # --------------------
+    # Get Schedule Quality - Example 1
+    # --------------------------------
     # Find project by name
     name_to_find = "212096 - 401 FIRST STREET (College Station)" # replace with your project name
     project = projects_api.find_project_by_name(name=name_to_find)
@@ -44,6 +44,23 @@ def main():
         scenario_id=scenario_id
     )
     print(json.dumps(schedule_quality_data, indent=4))
+    # --------------------
+
+    # Get Schedule Quality - Example 2
+    # --------------------------------
+    # Find project by id
+    project_id = 47939
+    project = projects_api.get_project(project_id=project_id)
+    project_id = project["id"]
+    scenario_id = project["defaultScenarioId"]
+
+    print("Get Schedule Quality")
+    schedule_quality_data = schedule_api.get_schedule_quality(
+        project_id=project_id,
+        scenario_id=scenario_id
+    )
+    #with open(f"./schedule-quality-{project_id}-{scenario_id}.json", "w") as f:
+    #    json.dump(schedule_quality_data, f, indent=4)
     # --------------------
 
     # Get Schedule Quality Metrics
