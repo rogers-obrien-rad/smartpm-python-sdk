@@ -1,6 +1,6 @@
 from smartpm.client import SmartPMClient
 from smartpm.decorators import api_wrapper, utility
-from smartpm.utils import plot_schedule_delay
+from smartpm.visuals import plot_schedule_delay
 from smartpm.logging_config import logger
 
 class Delay:
