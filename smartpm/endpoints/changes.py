@@ -1,6 +1,6 @@
 from smartpm.client import SmartPMClient
 from smartpm.decorators import api_wrapper, utility
-from smartpm.utils import plot_schedule_changes
+from smartpm.visuals import plot_schedule_changes
 from smartpm.logging_config import logger
 
 class Changes:

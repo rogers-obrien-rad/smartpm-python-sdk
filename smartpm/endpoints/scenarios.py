@@ -1,5 +1,5 @@
 from smartpm.client import SmartPMClient
-from smartpm.utils import plot_percent_complete_curve, plot_earned_schedule_curve
+from smartpm.visuals import plot_percent_complete_curve, plot_earned_schedule_curve
 from smartpm.decorators import api_wrapper, utility
 from smartpm.logging_config import logger
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
 from smartpm.client import SmartPMClient
-from smartpm.utils import plot_activity_distribution_by_month
+from smartpm.visuals import plot_activity_distribution_by_month
 from smartpm.decorators import api_wrapper, utility
 from smartpm.logging_config import logger
 from smartpm.endpoints.scenarios import Scenarios
