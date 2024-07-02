@@ -229,9 +229,9 @@ class Activity:
         return df
     
     @utility
-    def get_earliest_date(self, project_id, scenario_id, use_actual=True):
+    def get_extreme_date(self, project_id, scenario_id, use_actual=True, find_latest=False):
         """
-        Get the earliest date from list of activities
+        Get the earliest or latest date from list of activities
 
         Parameters
         ----------
@@ -241,37 +241,62 @@ class Activity:
             ID of the scenario to retrieve the percent complete curve for
         use_actual : bool, default True
             If True, use 'actualStartDate', otherwise use 'startDate'.
+        find_latest : bool, default False
+            If True, find the latest date using finish dates. If False, find the earliest date using start dates.
 
         Returns
         -------
-        earliest_date : str
-            The earliest date as a string.
+        extreme_date : str
+            The earliest or latest date as a string.
         """
         activities = self.get_activities(project_id, scenario_id)
 
-        date_key = 'actualStartDate' if use_actual else 'startDate'
+        if find_latest:
+            date_key = 'actualFinishDate' if use_actual else 'finishDate'
+        else:
+            date_key = 'actualStartDate' if use_actual else 'startDate'
+        
         dates = [entry[date_key] for entry in activities if entry[date_key] is not None]
-        earliest_date = min(dates, key=lambda date: pd.to_datetime(date))
+        
+        if find_latest:
+            extreme_date = max(dates, key=lambda date: pd.to_datetime(date))
+        else:
+            extreme_date = min(dates, key=lambda date: pd.to_datetime(date))
 
-        return earliest_date
+        return extreme_date
+
     
-    def get_earliest_baseline_start_date(self, project_id, scenario_id):
+    @utility
+    def get_extreme_baseline_date(self, project_id, scenario_id, find_latest=False):
         """
-        Get the earliest baseline start date from the provided JSON data.
+        Get the earliest or latest baseline date from the provided JSON data.
 
         Parameters
         ----------
-        json_data : list of dict
-            List of dictionaries containing the data.
+        project_id : str
+            ID of the project containing the scenario
+        scenario_id : str
+            ID of the scenario to retrieve the percent complete curve for
+        find_latest : bool, default False
+            If True, find the latest date using finish dates. If False, find the earliest date using start dates.
 
         Returns
         -------
         str
-            The earliest baseline start date as a string.
+            The earliest or latest baseline date as a string.
         """
         activities = self.get_activities(project_id, scenario_id)
 
-        dates = [entry['baseline']['startDate'] for entry in activities if entry['baseline']['startDate'] is not None]
-        earliest_date = min(dates, key=lambda date: pd.to_datetime(date))
+        if find_latest:
+            date_key = 'finishDate'
+        else:
+            date_key = 'startDate'
         
-        return earliest_date
+        dates = [entry['baseline'][date_key] for entry in activities if entry['baseline'][date_key] is not None]
+        
+        if find_latest:
+            extreme_date = max(dates, key=lambda date: pd.to_datetime(date))
+        else:
+            extreme_date = min(dates, key=lambda date: pd.to_datetime(date))
+
+        return extreme_date

@@ -59,8 +59,8 @@ def main():
         project_id=project_id,
         scenario_id=scenario_id
     )
-    #with open(f"./schedule-quality-{project_id}-{scenario_id}.json", "w") as f:
-    #    json.dump(schedule_quality_data, f, indent=4)
+    with open(f"./schedule-quality-{project_id}-{scenario_id}.json", "w") as f:
+        json.dump(schedule_quality_data, f, indent=4)
     # --------------------
 
     # Get Schedule Quality Metrics
