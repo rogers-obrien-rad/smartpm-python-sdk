@@ -28,7 +28,7 @@ def main():
     project = projects_api.find_project_by_name(name=name_to_find)
     project_id = project["id"]
 
-    # Get scenarios by supplying the project ID from any project, in this case the first project in the list
+    # Get scenarios by supplying the project ID from any project
     print(f"Get All Scenarios for project: {project_id}")
     scenarios = scenarios_api.get_scenarios(project_id=project_id)
     print("Scenarios:")
