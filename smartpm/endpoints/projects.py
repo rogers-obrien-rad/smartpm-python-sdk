@@ -35,6 +35,46 @@ class Projects:
         return response
 
     @api_wrapper
+    def get_active_projects(self, as_of=None):
+        """
+        Access basic project data: https://developers.smartpmtech.com/#operation/get-projects
+        Note: the `filters` parameter is hard-coded since the provided filter options are needed.
+
+        Parameters
+        ----------
+        as_of : str
+            specify date since projects have changed in format `2023-07-19T12:00:00`
+
+        Returns
+        -------
+        <response.json> : list of dict
+            projects data as a JSON object
+        """
+        logger.debug(f"Fetching projects as of: {as_of}")
+        
+        # Hard-code project plan filters into the params
+        # Inactive: 0b657f37-e317-4d65-9ebd-b4f6f0aae4b1
+        filters = [
+            'PROJECT_PLAN_ID:1164d4b6-9635-42ca-b004-37907055b285',
+            'PROJECT_PLAN_ID:6698a06d-a690-4a8d-8bb9-07ebd96ba320',
+            'PROJECT_PLAN_ID:9beb9b50-649b-48b1-a367-9b937c75cee3'
+        ]
+        
+        # Construct the params dict
+        params = {
+            'filters': filters  # Passing the filters as a list
+        }
+        
+        if as_of:
+            params['asOf'] = as_of
+
+        endpoint = 'v1/projects'
+        response = self.client._get(endpoint=endpoint, params=params)
+        
+        return response
+
+
+    @api_wrapper
     def get_project(self, project_id):
         """
         Get a specific project by its ID: https://developers.smartpmtech.com/#operation/get-project

@@ -49,6 +49,16 @@ def main():
     output_projects(project_list=projects)
     # ----------------
 
+    # Get Active Projects
+    # ----------------
+    print("Get Active Projects")
+    active_projects = projects_api.get_active_projects()
+
+    # Show projects
+    print("Number of Active Projects:", len(active_projects))
+    output_projects(project_list=active_projects)
+    # ----------------
+
     # Get Recently Updated Projects
     # -----------------------------
     print("\nGet Recently Updated Projects")
@@ -62,7 +72,7 @@ def main():
     # Get Specific Project
     # --------------------
     print("\nGet Specific Project")
-    project_id = 47939
+    project_id = 47808
     project_details = projects_api.get_project(project_id=project_id)
     print(json.dumps(project_details, indent=4))
 
